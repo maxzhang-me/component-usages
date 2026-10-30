@@ -1,0 +1,12 @@
+import { readFileSync, mkdirSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { spawnSync } from 'node:child_process';
+const require = createRequire(import.meta.url);
+const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
+mkdirSync('artifacts', { recursive: true });
+const target = `artifacts/${pkg.name}-${pkg.version}.vsix`;
+const args = [require.resolve('@vscode/vsce/vsce'), 'package', '--no-dependencies', '--out', target];
+if (!pkg.repository) args.push('--allow-missing-repository');
+const result = spawnSync(process.execPath, args, { stdio: 'inherit' });
+if (result.error) throw result.error;
+process.exitCode = result.status ?? 1;

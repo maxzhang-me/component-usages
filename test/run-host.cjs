@@ -1,0 +1,20 @@
+const {runTests}=require('@vscode/test-electron');
+const path=require('node:path');
+const fs=require('node:fs');
+const root=path.resolve(__dirname,'..');
+const fixture=path.join(root,'.vscode-test','fixture');
+fs.mkdirSync(fixture,{recursive:true});
+fs.writeFileSync(path.join(fixture,'Card.vue'),'<template><button>Card</button></template>');
+fs.writeFileSync(path.join(fixture,'App.vue'),`<script setup>import Card from './Card.vue'</script>\n<template><Card/></template>`);
+// Reproduce the user's project without any autoImportDirectories configuration.
+const dialog='components/account/payment/installments_due/autoPayDialog.vue';
+const name='AccountPaymentInstallmentsDueAutoPayDialog';
+fs.mkdirSync(path.join(fixture,path.dirname(dialog)),{recursive:true});
+fs.mkdirSync(path.join(fixture,'.nuxt','types'),{recursive:true});
+fs.mkdirSync(path.join(fixture,'.vscode'),{recursive:true});
+fs.writeFileSync(path.join(fixture,dialog),'<template><div/></template>');
+fs.writeFileSync(path.join(fixture,'account.vue'),`<template>\n<${name}\n @refresh="getDetail"\n ref="autoPayRef"\n></${name}>\n</template>`);
+fs.writeFileSync(path.join(fixture,'.nuxt','components.d.ts'),`interface _GlobalComponents {'${name}': typeof import('../${dialog}')['default']}\ndeclare module 'vue' {export interface GlobalComponents extends _GlobalComponents {}}\nexport {}`);
+fs.writeFileSync(path.join(fixture,'.vscode','settings.json'),JSON.stringify({'files.exclude':{'**/.nuxt':true},'search.exclude':{'**/.nuxt':true},'files.watcherExclude':{'**/.nuxt/**':true}}));
+const localCode = '/Applications/Visual Studio Code.app/Contents/MacOS/Code';
+runTests({vscodeExecutablePath:process.env.VSCODE_EXECUTABLE_PATH || (process.platform === 'darwin' && fs.existsSync(localCode) ? localCode : undefined),extensionDevelopmentPath:root,extensionTestsPath:path.join(__dirname,'host.cjs'),launchArgs:[fixture,'--disable-extensions','--skip-welcome','--skip-release-notes','--user-data-dir='+path.join(root,'.vscode-test','user-data')]}).catch(e=>{console.error(e);process.exit(1)});

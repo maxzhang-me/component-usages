@@ -1,0 +1,36 @@
+name: Publish to VS Code Marketplace
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag, such as v0.1.3
+        type: string
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: marketplace-publish
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: marketplace
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - name: Validate release and publisher
+        run: node scripts/verify-release.mjs --marketplace
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+      - run: npm ci
+      - run: npm run package
+      - name: Publish built VSIX
+        run: npx --no-install vsce publish --packagePath artifacts/*.vsix
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}

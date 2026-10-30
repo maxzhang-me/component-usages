@@ -1,0 +1,186 @@
+{
+  "name": "component-usages-code-vision",
+  "displayName": "Component Usages — Code Vision",
+  "description": "WebStorm-style component usages above Vue, Svelte, Astro and React files.",
+  "version": "0.1.2",
+  "publisher": "local-tools",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.95.0",
+    "node": ">=22"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:vue",
+    "onLanguage:svelte",
+    "onLanguage:astro",
+    "onLanguage:typescriptreact",
+    "onLanguage:javascriptreact",
+    "onStartupFinished"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": true
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "tsc --noEmit",
+    "test": "npm run build && node --test test/*.test.cjs",
+    "test:host": "node test/run-host.cjs",
+    "package": "npm run check && npm test && node scripts/package.mjs",
+    "vscode:prepublish": "npm run build",
+    "validate:release": "node scripts/verify-release.mjs"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "componentUsages.show",
+        "title": "显示组件用法 / Show Component Usages",
+        "category": "Component Usages"
+      },
+      {
+        "command": "componentUsages.peek",
+        "title": "预览组件用法 / Peek Component Usages",
+        "category": "Component Usages"
+      },
+      {
+        "command": "componentUsages.refresh",
+        "title": "刷新用法索引 / Refresh Index",
+        "category": "Component Usages"
+      },
+      {
+        "command": "componentUsages.toggle",
+        "title": "显示或隐藏提示 / Toggle Hints",
+        "category": "Component Usages"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "componentUsages.show",
+          "when": "resourceExtname =~ /\\.(vue|svelte|astro|tsx|jsx)$/",
+          "group": "navigation@10"
+        },
+        {
+          "command": "componentUsages.peek",
+          "when": "resourceExtname =~ /\\.(vue|svelte|astro|tsx|jsx)$/",
+          "group": "navigation@11"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Component Usages",
+      "properties": {
+        "componentUsages.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "在组件顶部显示用法 CodeLens（还需启用 editor.codeLens）。"
+        },
+        "componentUsages.label": {
+          "type": "string",
+          "enum": [
+            "action",
+            "count"
+          ],
+          "default": "action",
+          "description": "action 显示 WebStorm 风格入口；count 显示已索引的用法数量。"
+        },
+        "componentUsages.language": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "zh-cn",
+            "en"
+          ],
+          "default": "auto",
+          "description": "提示及列表语言。"
+        },
+        "componentUsages.openMode": {
+          "type": "string",
+          "enum": [
+            "popup",
+            "peek"
+          ],
+          "default": "popup",
+          "description": "多处用法显示可搜索列表，或 VS Code 内嵌引用预览。"
+        },
+        "componentUsages.singleUsageJump": {
+          "type": "boolean",
+          "default": true,
+          "description": "只有一处用法时直接跳转。"
+        },
+        "componentUsages.include": {
+          "type": "string",
+          "default": "**/*.{vue,svelte,astro,tsx,jsx,ts,js,mts,mjs,cts,cjs}",
+          "description": "参与索引的文件 glob。"
+        },
+        "componentUsages.exclude": {
+          "type": "string",
+          "default": "**/{node_modules,.git,dist,build,coverage,.next,.nuxt,.svelte-kit,vendor}/**",
+          "description": "排除的文件 glob。"
+        },
+        "componentUsages.maxFiles": {
+          "type": "integer",
+          "default": 15000,
+          "minimum": 100,
+          "description": "索引文件上限；超出时提示，避免将不完整结果显示为完整结果。"
+        },
+        "componentUsages.aliases": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "补充路径别名，如 {\"@\": \"./src\"}；相对当前工作区目录。也会读取最近的 tsconfig/jsconfig paths。"
+        },
+        "componentUsages.globalComponents": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "显式全局组件映射，如 {\"AppButton\": \"src/components/Button.vue\"}。"
+        },
+        "componentUsages.autoImportDirectories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "约定自动导入目录，相对工作区根目录，例如 [\"components\", \"src/components\"]；支持文件名与目录前缀名称。默认关闭，避免同名误报。"
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.95.0",
+    "@vscode/test-electron": "^2.5.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0",
+    "@vue/compiler-dom": "^3.5.0",
+    "@vue/compiler-sfc": "^3.5.0"
+  },
+  "keywords": [
+    "vue",
+    "nuxt",
+    "component",
+    "usages",
+    "code-vision"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maxzhang-me/component-usages.git"
+  },
+  "homepage": "https://github.com/maxzhang-me/component-usages#readme",
+  "bugs": {
+    "url": "https://github.com/maxzhang-me/component-usages/issues"
+  }
+}

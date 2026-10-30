@@ -1,0 +1,16 @@
+name: Bug report / 问题反馈
+description: Report missing usages or navigation problems.
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤与最小示例
+      description: 请提供组件路径、导入或 Nuxt 声明、调用标签，以及实际和预期结果。
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: VS Code、插件、框架版本
+    validations:
+      required: true

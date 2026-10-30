@@ -1,0 +1,13 @@
+node_modules
+dist/
+artifacts/
+.vscode-test/
+*.vsix
+*.zip
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+.vsce
+.vsce-pat
