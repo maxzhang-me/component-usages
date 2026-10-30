@@ -3,7 +3,7 @@
   "displayName": "Component Usages — Code Vision",
   "description": "WebStorm-style component usages above Vue, Svelte, Astro and React files.",
   "version": "0.1.2",
-  "publisher": "local-tools",
+  "publisher": "max-zhang",
   "license": "MIT",
   "engines": {
     "vscode": "^1.95.0",

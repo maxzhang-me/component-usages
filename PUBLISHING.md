@@ -27,9 +27,9 @@ git push origin v0.1.3
 
 ## VS Code Marketplace 首次发布
 
-当前 `publisher: local-tools` 是本地安装包使用的占位值。先在 [Marketplace 管理页](https://marketplace.visualstudio.com/manage) 创建发布者，并将 package.json 的 `publisher` 改为实际 ID，同时配置真实的 repository URL。GitHub 账号与 Marketplace 发布者是两种独立身份。首次上架前确认名称和 publisher；它们组成插件 ID，修改 publisher 会成为另一个插件，已有本地安装不会自动迁移。
+已配置 Marketplace 发布者 **`max-zhang`**，插件 ID 为 **`max-zhang.component-usages-code-vision`**。仓库地址已配置为 `https://github.com/maxzhang-me/component-usages`。GitHub 账号与 Marketplace 发布者是两种独立身份；后续保持 publisher 与插件 name 稳定。此前使用 `local-tools` 的本地安装包与正式发布的插件属于不同插件 ID。
 
-最直接的方式是运行 `npm run package`，在管理页上传生成的 VSIX。确认以上身份配置后再发布正式版本。
+最直接的方式是运行 `npm run package`，在管理页上传生成的 VSIX。发布者管理页中选择 `max-zhang`，再上传生成的 VSIX。
 
 也可以启用仓库中的手动工作流：
 
