@@ -84,7 +84,7 @@ Nuxt 默认自动导入无需配置：扩展会定向读取 `.nuxt/components.d.
 
 ## 维护与发布
 
-构建、测试和贡献说明见 [CONTRIBUTING.md](CONTRIBUTING.md)，GitHub Release 与 Marketplace 发布步骤见 [PUBLISHING.md](PUBLISHING.md)。每次推送或 PR 会触发 CI；推送 `v版本号` 标签会生成附带 VSIX 的草稿 Release。
+构建、测试和贡献说明见 [CONTRIBUTING.md](CONTRIBUTING.md)，GitHub Release 与 Marketplace 发布步骤见 [PUBLISHING.md](PUBLISHING.md)。每次推送或 PR 会触发 CI；完成一次 Marketplace Trusted Publishing 配置后，推送 `v版本号` 标签会自动测试、打包并上架，同时生成附带 VSIX 的 GitHub 草稿 Release。
 
 ## 开发与验证
 

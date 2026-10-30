@@ -162,11 +162,11 @@
     "@types/node": "^22.0.0",
     "@types/vscode": "^1.95.0",
     "@vscode/test-electron": "^2.5.0",
-    "@vscode/vsce": "^3.0.0",
-    "esbuild": "^0.25.0",
-    "typescript": "^5.7.0",
+    "@vscode/vsce": "4.1.0",
     "@vue/compiler-dom": "^3.5.0",
-    "@vue/compiler-sfc": "^3.5.0"
+    "@vue/compiler-sfc": "^3.5.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0"
   },
   "keywords": [
     "vue",

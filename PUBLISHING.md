@@ -1,43 +1,45 @@
-# 版本与发布
+# 版本与自动发布
 
-## 本地打包
+发布者为 **`max-zhang`**，插件 ID 为 **`max-zhang.component-usages-code-vision`**。
+
+推送与 `package.json` 版本一致的 `v版本号` 标签后，GitHub Actions 会自动验证版本、执行检查和测试、生成 VSIX，然后上架到 VS Code Marketplace。普通代码推送只运行 CI。
+
+## 首次配置：添加信任授权
+
+GitHub 的 `marketplace` 环境已创建。还需要发布者本人在 [Marketplace 发布者后台](https://marketplace.visualstudio.com/manage) 为 `max-zhang` 添加一次 Trusted Publishing 策略：
+
+| 字段 | 填写值 |
+| --- | --- |
+| Policy name | `component-usages-release`（可自定义） |
+| Repository owner | `maxzhang-me` |
+| Repository | `component-usages` |
+| Workflow | `publish-marketplace.yml` |
+| Environment | `marketplace` |
+
+打开发布者 → Trusted Publishing → Create，填写上述字段并保存。Workflow 仅填写文件名，Environment 需完全一致。此授权在 Marketplace 端配置，GitHub 设置不能代替它。
+
+工作流通过 GitHub OIDC 获取短期凭据，使用已锁定的 `@vscode/vsce` 4.1.0。**不需要创建或保存 `VSCE_PAT` secret。** 配置依据：[VS Code 官方 Trusted Publishing 文档](https://code.visualstudio.com/api/working-with-extensions/publishing-extension#publish-with-github-actions-and-trusted-publishing)。
+
+## 后续发布
+
+先提交功能修改和 CHANGELOG，再运行：
+
+```sh
+npm version patch -m "Release %s"
+git push origin main --follow-tags
+```
+
+`npm version patch` 会同步更新 package.json 和 package-lock.json，创建版本提交及带注释的 `v版本号` 标签；`--follow-tags` 将该标签与 main 一起推送。例如从 0.1.2 升级到 0.1.3，会触发 `v0.1.3` 自动发布。
+
+发布进度见 [Marketplace 工作流](https://github.com/maxzhang-me/component-usages/actions/workflows/publish-marketplace.yml)。如果测试、版本检查或认证失败，上架流程会停止；修复认证后可在 Actions 中重新运行，或手动选择该工作流并输入同一标签。已经上架的版本不能重复发布，新修改应提升版本号。
+
+同一标签也会生成带 VSIX 的 GitHub 草稿 Release。草稿是否公开发布只影响 GitHub 展示，不影响 Marketplace 自动上架。
+
+## 本地打包或首次手动上架
 
 ```sh
 npm ci
 npm run package
 ```
 
-VSIX 输出到 `artifacts/`，文件名自动包含 `package.json` 中的版本。源码仓库不提交依赖、编译结果或安装包。
-
-## GitHub Release
-
-修复功能后更新 `CHANGELOG.md`，然后创建版本提交与标签：
-
-```sh
-npm version patch --no-git-tag-version
-npm run package
-git add package.json package-lock.json CHANGELOG.md
-git commit -m "Release 0.1.3"
-git tag v0.1.3
-git push origin main
-git push origin v0.1.3
-```
-
-示例版本 `0.1.3` 需要替换为实际版本。标签必须与 package.json 完全一致。GitHub Release 工作流会验证版本、执行测试、打包并创建附带 VSIX 的草稿 Release。检查草稿后，在 GitHub 点击发布。
-
-## VS Code Marketplace 首次发布
-
-已配置 Marketplace 发布者 **`max-zhang`**，插件 ID 为 **`max-zhang.component-usages-code-vision`**。仓库地址已配置为 `https://github.com/maxzhang-me/component-usages`。GitHub 账号与 Marketplace 发布者是两种独立身份；后续保持 publisher 与插件 name 稳定。此前使用 `local-tools` 的本地安装包与正式发布的插件属于不同插件 ID。
-
-最直接的方式是运行 `npm run package`，在管理页上传生成的 VSIX。发布者管理页中选择 `max-zhang`，再上传生成的 VSIX。
-
-也可以启用仓库中的手动工作流：
-
-1. 在 GitHub Settings → Environments 创建 `marketplace` 环境；如账号与仓库类型支持，可配置审批人。
-2. 按 [VS Code 官方发布文档](https://code.visualstudio.com/api/working-with-extensions/publishing-extension) 创建有 Marketplace Manage 权限的组织范围 Azure DevOps PAT，将其保存为该环境的 `VSCE_PAT` secret。
-3. 提交 publisher / repository 配置，创建并推送与版本一致的标签。
-4. 在 Actions 选择 **Publish to VS Code Marketplace**，输入该标签，点击 Run workflow。流程会验证身份配置、检查、测试、打包，再上传 VSIX。
-
-仓库推送和 GitHub Release 不会触发市场发布。令牌仅通过 GitHub Secrets 提供，不写入代码或命令参数。
-
-官方还提供 [Trusted Publishing / OIDC](https://code.visualstudio.com/api/working-with-extensions/publishing-extension#publish-with-github-actions-and-trusted-publishing)，可在所使用的 vsce 版本支持 `--oidc` 后切换。当前锁定工具版本的 `publish --help` 尚不包含该参数，因此这里提供已支持的 PAT 发布流程以及无需令牌的管理页上传方式。
+输出位于 `artifacts/component-usages-code-vision-版本号.vsix`。也可在发布者后台选择 `max-zhang`，直接上传 VSIX。此前 `local-tools` 本地安装包与正式插件属于不同插件 ID；后续保持 publisher 与 name 稳定。

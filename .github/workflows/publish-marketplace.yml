@@ -1,5 +1,7 @@
 name: Publish to VS Code Marketplace
 on:
+  push:
+    tags: ['v*']
   workflow_dispatch:
     inputs:
       tag:
@@ -11,14 +13,19 @@ permissions:
 concurrency:
   group: marketplace-publish
   cancel-in-progress: false
+env:
+  RELEASE_TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
 jobs:
   publish:
     runs-on: ubuntu-latest
     environment: marketplace
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: refs/tags/${{ inputs.tag }}
+          ref: refs/tags/${{ env.RELEASE_TAG }}
           persist-credentials: false
       - uses: actions/setup-node@v7
         with:
@@ -26,11 +33,7 @@ jobs:
           cache: npm
       - name: Validate release and publisher
         run: node scripts/verify-release.mjs --marketplace
-        env:
-          RELEASE_TAG: ${{ inputs.tag }}
       - run: npm ci
       - run: npm run package
-      - name: Publish built VSIX
-        run: npx --no-install vsce publish --packagePath artifacts/*.vsix
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      - name: Publish built VSIX with Trusted Publishing
+        run: npx --no-install vsce publish --oidc --packagePath artifacts/*.vsix
